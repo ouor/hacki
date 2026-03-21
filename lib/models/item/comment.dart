@@ -14,6 +14,8 @@ class Comment extends Item {
     required super.hidden,
     required this.level,
     required this.isFromCache,
+    this.isHiddenByUser = false,
+    this.isCollapsedByUser = false,
   }) : super(
           descendants: 0,
           parts: <int>[],
@@ -24,9 +26,13 @@ class Comment extends Item {
 
   Comment.fromJson(super.json, {this.level = 0})
       : isFromCache = json['fromCache'] == true,
+        isHiddenByUser = false,
+        isCollapsedByUser = false,
         super.fromJson();
 
   final int level;
+  final bool isHiddenByUser;
+  final bool isCollapsedByUser;
   final bool isFromCache;
 
   String get metadata => '''by $by $timeAgo''';
@@ -35,8 +41,10 @@ class Comment extends Item {
 
   Comment copyWith({
     int? level,
-    bool? hidden,
     int? kid,
+    bool? hidden,
+    bool? isHiddenByUser,
+    bool? isCollapsedByUser,
   }) {
     return Comment(
       id: id,
@@ -51,9 +59,18 @@ class Comment extends Item {
       hidden: hidden ?? this.hidden,
       level: level ?? this.level,
       isFromCache: isFromCache,
+      isHiddenByUser: isHiddenByUser ?? this.isHiddenByUser,
+      isCollapsedByUser: isCollapsedByUser ?? this.isCollapsedByUser,
     );
   }
 
   @override
   bool? get stringify => false;
+
+  @override
+  List<Object?> get props => <Object?>[
+        ...super.props,
+        isHiddenByUser,
+        isCollapsedByUser,
+      ];
 }

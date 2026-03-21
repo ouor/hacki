@@ -40,8 +40,9 @@ class ItemText extends StatelessWidget {
       SelectionChangedCause? cause,
     ) {
       if (cause == SelectionChangedCause.longPress &&
-          selection.baseOffset != selection.extentOffset) {
-        context.tryRead<CollapseCubit>()?.lock();
+          selection.baseOffset != selection.extentOffset &&
+          item is Comment) {
+        context.tryRead<CommentsCubit>()?.lock(item as Comment);
       }
     }
 
@@ -57,6 +58,7 @@ class ItemText extends StatelessWidget {
             context,
           ),
         ),
+        scrollPhysics: const NeverScrollableScrollPhysics(),
         selectionColor:
             Theme.of(context).colorScheme.primaryContainer.withAlpha(180),
         onTap: onTap,
