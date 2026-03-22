@@ -15,7 +15,7 @@ class CollapseStateCacheRepository with Loggable {
   }
 
   static const String _boxName = 'persistedCollapseStates';
-  static const int _maxLength = 100;
+  static const int _maxLength = 5000;
   final Future<Box<String>> _box;
 
   Map<int, Map<int, Comment>> _itemIdToPreviousStates =
@@ -57,7 +57,7 @@ class CollapseStateCacheRepository with Loggable {
     final Map<String, String> entries = commentMap.map(
       (int commentId, Comment comment) => MapEntry<String, String>(
         '${storyId}_$commentId',
-        jsonEncode(comment.toJson(withCollapseState: true)),
+        jsonEncode(comment.toJsonWithOnlyCollapseState()),
       ),
     );
     await box.putAll(entries);
@@ -74,7 +74,7 @@ class CollapseStateCacheRepository with Loggable {
           .where((String k) => k.startsWith(prefix))
           .map((String k) {
         final int commentId = int.parse(k.split('_').last);
-        final Comment comment = Comment.fromJson(
+        final Comment comment = Comment.fromJsonWithCollapsedStateOnly(
           jsonDecode(box.get(k)!) as Map<String, dynamic>,
         );
         return MapEntry<int, Comment>(commentId, comment);
@@ -103,10 +103,11 @@ class CollapseStateCacheRepository with Loggable {
       }
     }
 
+    logInfo(
+      '${box.length} keys detected in preserved collapse states',
+    );
+
     if (box.length > _maxLength) {
-      logDebug(
-        'more than $_maxLength keys detected in preserved collapse states',
-      );
       final Set<String> seenStories = <String>{};
       final List<String> orderedStoryIds = box.keys
           .cast<String>()
