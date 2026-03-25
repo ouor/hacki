@@ -1038,7 +1038,9 @@ comments length is ${state.comments.length}
     }
 
     if (_previousCommentStates != null && state.item is Story) {
-      _itemIdToPreviousStates[state.item.id]?.addAll(_previousCommentStates!);
+      _itemIdToPreviousStates
+          .putIfAbsent(state.item.id, () => <int, Comment>{})
+          .addAll(_previousCommentStates ?? <int, Comment>{});
 
       if (_preferenceCubit.state.shouldPersistCollapseStateAcrossSessions) {
         _collapseStateCacheRepository.saveStoryStates(
