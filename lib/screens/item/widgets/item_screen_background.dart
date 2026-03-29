@@ -11,11 +11,13 @@ class ItemScreenBackground extends StatefulWidget {
   const ItemScreenBackground({
     required this.indentPadding,
     required this.indentLineWidth,
+    this.shouldShowRootLevelLine = true,
     super.key,
   });
 
   final double indentPadding;
   final double indentLineWidth;
+  final bool shouldShowRootLevelLine;
 
   @override
   State<ItemScreenBackground> createState() => _ItemScreenBackgroundState();
@@ -43,7 +45,7 @@ class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
           _timer?.cancel();
           _timer = Timer.periodic(const Duration(milliseconds: 1200), (_) {
             setState(() {
-              _shineIndex = (_shineIndex + 1) % state.maxLevel;
+              _shineIndex = (_shineIndex + 1) % (state.maxLevel + 1);
             });
           });
         }
@@ -53,24 +55,25 @@ class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
       builder: (BuildContext context, CommentsState state) {
         return Stack(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.zero,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                width: widget.indentLineWidth,
-                child: isEyeCandyEnabled
-                    ? AnimatedIndentLine(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        width: widget.indentLineWidth,
-                        isShining: _shineIndex == 0,
-                      )
-                    : Container(
-                        width: widget.indentLineWidth,
-                        height: MediaQuery.of(context).size.height,
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                      ),
+            if (widget.shouldShowRootLevelLine && state.comments.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.zero,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  width: widget.indentLineWidth,
+                  child: isEyeCandyEnabled
+                      ? AnimatedIndentLine(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          width: widget.indentLineWidth,
+                          isShining: _shineIndex == 0,
+                        )
+                      : Container(
+                          width: widget.indentLineWidth,
+                          height: MediaQuery.of(context).size.height,
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                        ),
+                ),
               ),
-            ),
             if (state.maxLevel > 0)
               for (final int i in 1.to(
                 state.maxLevel,
@@ -89,7 +92,7 @@ class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
                               Theme.of(context).canvasColor,
                             ).$1,
                             width: widget.indentLineWidth,
-                            isShining: _shineIndex + 1 == i,
+                            isShining: _shineIndex == i,
                           )
                         : Container(
                             width: widget.indentLineWidth,

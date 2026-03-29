@@ -28,29 +28,116 @@ Features:
 - Download stories and comments for offline reading.
 - Pick up where you left off.
 - Synced favorites and pins across devices. (iOS only)
-- Export or import your favorites. 
+- Export or import your favorites.
 - Launch from system share sheet.
 - Share story or comment as image.
 - And more...
 
 
+# Home page and story tile customization
 <p align="center">
-    <img width="400" alt="01" src="assets/screenshots/selected/01_hacki.png"> 
-    <img width="400" alt="06" src="assets/screenshots/selected/02_hacki.png"> 
-    <img width="400" alt="02" src="assets/screenshots/selected/03_hacki.png">
-    <img width="400" alt="07" src="assets/screenshots/selected/04_hacki.png">
-    <img width="400" alt="03" src="assets/screenshots/selected/05_hacki.png"> 
-    <img width="400" alt="08" src="assets/screenshots/selected/06_hacki.png">
-    <img width="400" alt="04" src="assets/screenshots/selected/07_hacki.png"> 
-    <img width="400" alt="09" src="assets/screenshots/selected/08_hacki.png"> 
-    <img width="400" alt="05" src="assets/screenshots/selected/09_hacki.png">
-    <img width="400" alt="10" src="assets/screenshots/selected/10_hacki.png"> 
-    <img width="400" alt="10" src="assets/screenshots/selected/11_hacki.png"> 
-    <img width="400" alt="10" src="assets/screenshots/selected/12_hacki.png">
-   
+    <img width="200" alt="01" src="assets/new_screenshots/hacki_01.png">
+    <img width="200" alt="07" src="assets/new_screenshots/hacki_04.png">
+    <img width="200" alt="03" src="assets/new_screenshots/hacki_05.png"> 
+    <img width="200" alt="09" src="assets/new_screenshots/hacki_08.png"> 
+    <img width="200" alt="06" src="assets/new_screenshots/hacki_02.png"> 
+    <img width="200" alt="02" src="assets/new_screenshots/hacki_03.png">
+    <img width="200" alt="08" src="assets/new_screenshots/hacki_06.png">
+    <img width="200" alt="04" src="assets/new_screenshots/hacki_07.png">
+    <img width="200" alt="05" src="assets/new_screenshots/hacki_09.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_10.png"> 
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_11.png"> 
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_12.png">
+</p>
+
+# Thread reading experience
+
+### Thread
+<p align="center">
+    <img width="200" alt="01" src="assets/new_screenshots/hacki_21.png"> 
+    <img width="200" alt="06" src="assets/new_screenshots/hacki_22.png"> 
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_69.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_70.png">
+</p>
+
+### New comments notification and lookup
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_59.png"> 
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_60.png">
+</p>
+
+### In-thread search and other actions
+<p align="center">
+    <img width="200" alt="02" src="assets/new_screenshots/hacki_23.png">
+    <img width="200" alt="03" src="assets/new_screenshots/hacki_25.png">
+    <img width="200" alt="09" src="assets/new_screenshots/hacki_28.png">
+    <img width="200" alt="05" src="assets/new_screenshots/hacki_29.png">
+    <img width="200" alt="07" src="assets/new_screenshots/hacki_24.png">
+    <img width="200" alt="08" src="assets/new_screenshots/hacki_26.png">
+    <img width="200" alt="04" src="assets/new_screenshots/hacki_27.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_30.png">
+</p>
+
+### Ancestor lookup
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_61.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_64.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_65.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_68.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_62.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_63.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_66.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_67.png">
+</p>
+
+### Story and comment sharing
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_85.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_88.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_89.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_84.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_86.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_87.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_90.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_83.png">
+</p>
+
+# Login, reply notification, favorites sync and more
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_37.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_39.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_47.png">
+</p>
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_38.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_40.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_48.png">
+</p>
+
+# Settings
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_71.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_74.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_75.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_78.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_72.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_73.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_76.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_77.png">
+</p>
+
+# Accent color and font customization
+<p align="center">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_79.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_80.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_81.png">
+    <img width="200" alt="10" src="assets/new_screenshots/hacki_82.png">
+</p>
+
+# Tablet support
+<p align="center">
    <img width="400" alt="ipad-01" src="assets/screenshots/selected/hacki_tablet_01.png"> 
    <img width="400" alt="ipad-02" src="assets/screenshots/selected/hacki_tablet_02.png"> 
    <img width="400" alt="ipad-03" src="assets/screenshots/selected/hacki_tablet_03.png"> 
    <img width="400" alt="ipad-04" src="assets/screenshots/selected/hacki_tablet_04.png"> 
 </p>
-
