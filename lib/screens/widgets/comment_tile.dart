@@ -77,7 +77,6 @@ class CommentTile extends StatelessWidget {
         PreferenceState prefState,
         BlocklistState blocklistState,
       ) {
-        final Color primaryColor = Theme.of(context).colorScheme.primary;
         final (Color, Color) slidableColors = level > 0
             ? ColorUtil.getRainbowColor(
                 level,
@@ -175,7 +174,6 @@ class CommentTile extends StatelessWidget {
                         dismissible: DismissiblePane(
                           closeOnCancel: true,
                           confirmDismiss: () async {
-                            if (level == 0) return false;
                             DialogProxy.showTimeMachineDialog(
                               context,
                               rootItem:
@@ -443,7 +441,7 @@ class CommentTile extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           color: () {
             if (isMyComment) {
-              return primaryColor.withValues(alpha: 0.2);
+              return Theme.of(context).colorScheme.surfaceContainerHigh;
             } else if (shouldHighlightNewComments && comment.isNew) {
               return Theme.of(context).colorScheme.surfaceContainerLow;
             }
