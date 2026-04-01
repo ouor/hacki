@@ -8,9 +8,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hacki/config/constants.dart';
-import 'package:hacki/config/custom_router.dart';
 import 'package:hacki/config/locator.dart';
 import 'package:hacki/config/paths.dart';
+import 'package:hacki/config/router.dart';
 import 'package:hacki/cubits/cubits.dart';
 import 'package:hacki/extensions/extensions.dart';
 import 'package:hacki/models/models.dart';
@@ -879,7 +879,7 @@ comments length is ${state.comments.length}
           }
         }
 
-        await Future<void>.delayed(AppDurations.ms400, () {
+        await Future<void>.delayed(AppDurations.ms300, () {
           final BuildContext? newTargetCommentContext =
               targetCommentGlobalKey?.currentContext;
           if (targetCommentGlobalKey != null &&

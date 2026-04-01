@@ -190,9 +190,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                   ),
                 ),
-                Settings(
-                  authState: authState,
-                  pageType: pageType,
+                Visibility(
+                  visible: pageType == PageType.settings,
+                  child: Positioned.fill(
+                    top: context
+                            .read<PreferenceCubit>()
+                            .state
+                            .isHackerNewsThemeEnabled
+                        ? Dimens.pt64
+                        : Dimens.pt50,
+                    child: const SettingsView(),
+                  ),
                 ),
                 Align(
                   alignment: Alignment.topLeft,
