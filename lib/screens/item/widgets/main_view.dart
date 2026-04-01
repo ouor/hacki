@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DateUtils;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hacki/blocs/blocs.dart';
 import 'package:hacki/config/constants.dart';
 import 'package:hacki/cubits/cubits.dart';
@@ -60,7 +61,7 @@ class MainView extends StatelessWidget {
                 displacement: 200,
                 color: Theme.of(context).colorScheme.primaryContainer,
                 onRefresh: () async {
-                  HapticFeedbackUtil.light();
+                  HapticFeedbackUtils.light();
 
                   if (context.read<StoriesBloc>().state.isOfflineReading ==
                           false &&
@@ -118,15 +119,58 @@ class MainView extends StatelessWidget {
                           color: Theme.of(context).canvasColor,
                           height: MediaQuery.of(context).size.height -
                               MediaQuery.of(context).padding.top,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Dimens.pt48,
+                          ),
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               SizedBoxes.pt100,
-                              Text(
-                                Constants.happyFace,
-                                style: TextStyle(
-                                  color: Theme.of(context).hintColor,
+                              if (preferenceState.isEyeCandyEnabled)
+                                GestureDetector(
+                                  onTap: () => unawaited(
+                                    HapticFeedbackUtils.loadAndPlay(),
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.all(Dimens.pt24),
+                                      child: FaIcon(
+                                        FontAwesomeIcons.heartPulse,
+                                        applyTextScaling: false,
+                                        color: Theme.of(context).hintColor,
+                                        size: Dimens.pt36,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else if (DateUtils.isMidnight)
+                                Text(
+                                  'Time for bed',
+                                  style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                    fontSize: TextDimens.pt10,
+                                  ),
+                                  textScaler: TextScaler.noScaling,
+                                  textAlign: TextAlign.center,
+                                )
+                              else if (DateUtils.isTodayAnniversary)
+                                Text(
+                                  '''Hacki turns ${DateUtils.yearsSinceFirstCommit} today!''',
+                                  style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                    fontSize: TextDimens.pt10,
+                                  ),
+                                  textScaler: TextScaler.noScaling,
+                                  textAlign: TextAlign.center,
+                                )
+                              else
+                                Text(
+                                  Constants.happyFace,
+                                  style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                  ),
                                 ),
-                              ),
                               SizedBoxes.pt36,
                               Text(
                                 context.read<CommentsCubit>().currentTips,
@@ -135,6 +179,7 @@ class MainView extends StatelessWidget {
                                   color: Theme.of(context).hintColor,
                                 ),
                                 textScaler: TextScaler.noScaling,
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -234,7 +279,7 @@ class MainView extends StatelessWidget {
         );
       }
     } else {
-      HapticFeedbackUtil.error();
+      HapticFeedbackUtils.error();
       context.showSnackBar(
         content: SnackBarMessages.notLoggedInNoVoting,
         action: () {
@@ -252,7 +297,7 @@ class MainView extends StatelessWidget {
   }
 
   void onReplyTapped(BuildContext context, Comment cmt) {
-    HapticFeedbackUtil.light();
+    HapticFeedbackUtils.light();
     if (cmt.deleted || cmt.dead) {
       return;
     }
@@ -265,7 +310,7 @@ class MainView extends StatelessWidget {
   }
 
   void onEditTapped(BuildContext context, Comment cmt) {
-    HapticFeedbackUtil.light();
+    HapticFeedbackUtils.light();
     if (cmt.deleted || cmt.dead) {
       return;
     }
@@ -325,7 +370,7 @@ class _ParentItemSection extends StatelessWidget {
                     ),
                   CustomSlidableAction(
                     onPressed: (_) {
-                      HapticFeedbackUtil.light();
+                      HapticFeedbackUtils.light();
 
                       if (item.id !=
                           context.read<EditCubit>().state.replyingTo?.id) {
@@ -399,7 +444,7 @@ class _ParentItemSection extends StatelessWidget {
                         children: <Widget>[
                           if (item is Story)
                             InkWell(
-                              onTap: () => LinkUtil.launch(
+                              onTap: () => LinkUtils.launch(
                                 item.url,
                                 context,
                                 shouldUseReader: prefState.isReaderEnabled,
@@ -413,7 +458,7 @@ class _ParentItemSection extends StatelessWidget {
                                   Clipboard.setData(
                                     ClipboardData(text: item.url),
                                   ).whenComplete(() {
-                                    HapticFeedbackUtil.selection();
+                                    HapticFeedbackUtils.selection();
                                     if (context.mounted) {
                                       context.showSnackBar(
                                         content: 'Link copied.',
