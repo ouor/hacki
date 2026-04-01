@@ -474,6 +474,7 @@ class _ParentItemSection extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.only(
                                     left: Dimens.pt8,
+                                    bottom: Dimens.pt8,
                                   ),
                                   child: ItemText(
                                     item: item,
@@ -488,20 +489,18 @@ class _ParentItemSection extends StatelessWidget {
                       );
                     },
                   ),
-                  if (item is Story && item.isPoll)
+                  if (item is Story && item.isPoll) ...<Widget>[
                     BlocProvider<PollCubit>(
                       create: (BuildContext context) =>
                           PollCubit(story: item)..init(),
                       child: const PollView(),
                     ),
+                    SizedBoxes.pt6,
+                  ],
                 ],
               ),
             ),
           ),
-          if (item.text.isNotEmpty)
-            const SizedBox(
-              height: Dimens.pt8,
-            ),
           const Divider(
             height: Dimens.zero,
           ),
