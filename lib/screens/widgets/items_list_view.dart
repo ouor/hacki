@@ -88,10 +88,7 @@ class ItemsListView<T extends Item> extends StatelessWidget {
             final bool hasRead = context.read<StoriesBloc>().hasRead(e);
             final bool swipeGestureEnabled =
                 context.read<PreferenceCubit>().state.isSwipeGestureEnabled;
-            if (isHideInsteadOfMarkingGrayEnabled &&
-                context.watch<HideCubit>().isHidden(e.id)) {
-              return const <Widget>[];
-            }
+
             return <Widget>[
               if (shouldShowDivider && items.first.id != e.id)
                 Padding(
@@ -167,8 +164,9 @@ class ItemsListView<T extends Item> extends StatelessWidget {
                 )
               else ...<Widget>[
                 GestureDetector(
-                  /// If swipe gesture is enabled on home screen, use long press
-                  /// instead of slide action to trigger the action menu.
+                  /// If swipe gesture is enabled on home screen, use
+                  /// long press instead of slide action to trigger
+                  /// the action menu.
                   onLongPress: swipeGestureEnabled
                       ? () => onMoreTapped?.call(e, context.rect)
                       : null,
