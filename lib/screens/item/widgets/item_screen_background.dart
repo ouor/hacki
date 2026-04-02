@@ -7,6 +7,7 @@ import 'package:hacki/config/constants.dart';
 import 'package:hacki/cubits/cubits.dart';
 import 'package:hacki/extensions/extensions.dart';
 import 'package:hacki/screens/widgets/widgets.dart';
+import 'package:hacki/styles/styles.dart';
 import 'package:hacki/utils/utils.dart';
 
 class ItemScreenBackground extends StatefulWidget {
@@ -29,30 +30,32 @@ class ItemScreenBackground extends StatefulWidget {
 
 class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
   int _shineIndex = 0;
-  Timer? _timer;
   bool _isVisible = false;
+  bool _overrideCommentsStatus = false;
+
+  Timer? _visibilityTimer;
+  Timer? _overrideTimer;
 
   @override
   void initState() {
     super.initState();
 
-    unawaited(
-      Future<void>.delayed(
-        AppDurations.oneSecond,
-        () {
-          if (mounted) {
-            setState(() {
-              _isVisible = true;
-            });
-          }
-        },
-      ),
-    );
+    _visibilityTimer = Timer(AppDurations.oneSecond, () {
+      if (mounted) {
+        setState(() => _isVisible = true);
+      }
+    });
+    _overrideTimer = Timer(AppDurations.fiveSeconds, () {
+      if (mounted) {
+        setState(() => _overrideCommentsStatus = true);
+      }
+    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _visibilityTimer?.cancel();
+    _overrideTimer?.cancel();
     super.dispose();
   }
 
@@ -65,8 +68,9 @@ class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
           previous.status != current.status,
       listener: (BuildContext context, CommentsState state) {
         if (state.status == CommentsStatus.allLoaded && isEyeCandyEnabled) {
-          _timer?.cancel();
-          _timer = Timer.periodic(const Duration(milliseconds: 1200), (_) {
+          _visibilityTimer?.cancel();
+          _visibilityTimer =
+              Timer.periodic(const Duration(milliseconds: 1200), (_) {
             setState(() {
               _shineIndex = (_shineIndex + 1) % (state.maxLevel + 1);
             });
@@ -79,6 +83,25 @@ class _ItemScreenBackgroundState extends State<ItemScreenBackground> {
       builder: (BuildContext context, CommentsState state) {
         if (!_isVisible || state.comments.isEmpty) {
           return const SizedBox.shrink();
+        } else if (!_overrideCommentsStatus &&
+            state.status == CommentsStatus.inProgress) {
+          return FadeIn(
+            child: Stack(
+              children: <Widget>[
+                Positioned(
+                  left: Dimens.zero,
+                  top: Dimens.zero,
+                  bottom: Dimens.zero,
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: LinearProgressIndicator(
+                      minHeight: widget.indentLineWidth,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
         }
         return FadeIn(
           child: Stack(
