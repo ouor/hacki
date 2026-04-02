@@ -38,8 +38,11 @@ class FloatingSkipButtons extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 child: InkWell(
-                  onLongPress: () =>
-                      context.read<CommentsCubit>().scrollTo(index: 0),
+                  enableFeedback: false,
+                  onLongPress: () {
+                    HapticFeedbackUtils.light();
+                    context.read<CommentsCubit>().scrollTo(index: 0);
+                  },
                   child: FloatingActionButton(
                     enableFeedback: false,
                     backgroundColor: Theme.of(context)
@@ -70,7 +73,9 @@ class FloatingSkipButtons extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 child: InkWell(
+                  enableFeedback: false,
                   onLongPress: () {
+                    HapticFeedbackUtils.light();
                     final CommentsCubit cubit = context.read<CommentsCubit>();
                     cubit.scrollTo(index: cubit.state.comments.length - 1);
                   },
