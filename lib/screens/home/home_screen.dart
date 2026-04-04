@@ -87,14 +87,7 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     SchedulerBinding.instance
-      ..addPostFrameCallback((_) {
-        FeatureDiscovery.discoverFeatures(
-          context,
-          <String>{
-            DiscoverableFeature.login.featureId,
-          },
-        );
-      })
+      ..addPostFrameCallback((_) => showFeatureDiscoveryDialog())
       ..addPostFrameCallback((_) {
         final ModalRoute<dynamic>? route = ModalRoute.of(context);
 
@@ -205,6 +198,54 @@ class _HomeScreenState extends State<HomeScreen>
       context.read<SplitViewCubit>().disableSplitView();
       return MobileHomeScreen(
         homeScreen: homeScreen,
+      );
+    }
+  }
+
+  Future<void> showFeatureDiscoveryDialog() async {
+    final PreferenceRepository repo = locator.get<PreferenceRepository>();
+    final bool hasSeen = await repo.hasSeenTour ?? false;
+    if (!hasSeen) {
+      repo.markTourAsCompleted();
+      await FeatureDiscovery.clearPreferences(
+        // ignore: use_build_context_synchronously
+        context,
+        DiscoverableFeature.values.map((DiscoverableFeature e) => e.featureId),
+      );
+      await showDialog<void>(
+        // ignore: use_build_context_synchronously
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Welcome to Hacki!'),
+          content: const Text('Take a quick tour to see what Hacki can do?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.pop();
+                FeatureDiscovery.discoverFeatures(
+                  context,
+                  <String>{
+                    DiscoverableFeature.login.featureId,
+                    DiscoverableFeature.searchInThread.featureId,
+                    DiscoverableFeature.pinToTop.featureId,
+                    DiscoverableFeature.addStoryToFavList.featureId,
+                    DiscoverableFeature.settingsShortcutOnItemScreen.featureId,
+                    DiscoverableFeature.jumpUpButton.featureId,
+                    DiscoverableFeature.jumpDownButton.featureId,
+                  },
+                );
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        ),
       );
     }
   }

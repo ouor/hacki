@@ -16,6 +16,10 @@ class FloatingSkipButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWebViewBottomSheetEnabled =
+        context.select<PreferenceCubit, bool>(
+      (PreferenceCubit cubit) => cubit.state.isWebViewBottomSheetEnabled,
+    );
     return BlocBuilder<EditCubit, EditState>(
       buildWhen: (EditState previous, EditState current) =>
           previous.showReplyBox != current.showReplyBox,
@@ -72,6 +76,7 @@ class FloatingSkipButtons extends StatelessWidget {
                   Icons.keyboard_arrow_down,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
+                contentLocation: ContentLocation.above,
                 child: InkWell(
                   enableFeedback: false,
                   onLongPress: () {
@@ -103,6 +108,10 @@ class FloatingSkipButtons extends StatelessWidget {
                   ),
                 ),
               ),
+              if (isWebViewBottomSheetEnabled)
+                const SizedBox(
+                  height: Dimens.pt64,
+                ),
             ],
           ),
         );

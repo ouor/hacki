@@ -26,6 +26,7 @@ class CustomDescribedFeatureOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return DescribedFeatureOverlay(
       enablePulsingAnimation: !MediaQuery.of(context).disableAnimations,
+      barrierDismissible: false,
       featureId: feature.featureId,
       overflowMode: OverflowMode.extendBackground,
       targetColor: Theme.of(context).colorScheme.primaryContainer,
@@ -37,12 +38,26 @@ class CustomDescribedFeatureOverlay extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      description: Text(
-        feature.description,
-        style: TextStyle(
-          fontSize: TextDimens.pt16,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+      description: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            feature.description,
+            style: TextStyle(
+              fontSize: TextDimens.pt16,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          SizedBoxes.pt6,
+          Text(
+            'Tap anywhere inside to dismiss',
+            style: TextStyle(
+              fontSize: TextDimens.pt12,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+        ],
       ),
       contentLocation: contentLocation,
       onBackgroundTap: () {
@@ -50,12 +65,6 @@ class CustomDescribedFeatureOverlay extends StatelessWidget {
         FeatureDiscovery.completeCurrentStep(context);
         onComplete?.call();
         return Future<bool>.value(true);
-      },
-      onDismiss: () async {
-        HapticFeedbackUtils.light();
-        unawaited(FeatureDiscovery.completeCurrentStep(context));
-        onComplete?.call();
-        return false;
       },
       onComplete: () async {
         HapticFeedbackUtils.light();
