@@ -4,6 +4,7 @@ import 'package:hacki/config/constants.dart';
 import 'package:hacki/cubits/cubits.dart';
 import 'package:hacki/screens/widgets/spring_curve.dart';
 import 'package:hacki/styles/dimens.dart';
+import 'package:hacki/styles/palette.dart';
 import 'package:hacki/styles/sized_boxes.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -32,7 +33,7 @@ class _WebViewBottomSheetState extends State<WebViewBottomSheet>
   late final AnimationController _animController;
   late final Animation<double> _rotationAnim;
   static const double _minChildSize = 0.1;
-  static const double _maxChildSize = 0.9;
+  static const double _maxChildSize = 0.94;
   bool _isLoading = true;
   bool _canGoBack = false;
   bool _canGoForward = false;
@@ -120,9 +121,10 @@ class _WebViewBottomSheetState extends State<WebViewBottomSheet>
       snapSizes: const <double>[_minChildSize, 0.5, _maxChildSize],
       builder: (BuildContext context, ScrollController scrollController) {
         return Material(
+          color: Palette.transparent,
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(Dimens.pt20),
               ),
@@ -156,12 +158,16 @@ class _WebViewBottomSheetState extends State<WebViewBottomSheet>
                   child: SingleChildScrollView(
                     controller: scrollController,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         SizedBoxes.pt8,
                         RotationTransition(
                           turns: _rotationAnim,
-                          child: const Icon(
+                          child: Icon(
                             Icons.keyboard_arrow_up_rounded,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
                         ),
                         _UrlBar(
@@ -256,17 +262,19 @@ class _UrlBarState extends State<_UrlBar> {
       child: Row(
         children: <Widget>[
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
               size: TextDimens.pt18,
+              color: colorScheme.onPrimaryContainer,
             ),
             onPressed: widget.canGoBack ? widget.onBack : null,
             visualDensity: VisualDensity.compact,
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_forward_ios_rounded,
               size: TextDimens.pt18,
+              color: colorScheme.onPrimaryContainer,
             ),
             onPressed: widget.canGoForward ? widget.onForward : null,
             visualDensity: VisualDensity.compact,
@@ -302,14 +310,16 @@ class _UrlBarState extends State<_UrlBar> {
             icon: Icon(
               widget.isLoading ? Icons.close_rounded : Icons.refresh_rounded,
               size: TextDimens.pt20,
+              color: colorScheme.onPrimaryContainer,
             ),
             onPressed: widget.onRefresh,
             visualDensity: VisualDensity.compact,
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.close_rounded,
               size: TextDimens.pt20,
+              color: colorScheme.onPrimaryContainer,
             ),
             onPressed: widget.onClose,
             visualDensity: VisualDensity.compact,

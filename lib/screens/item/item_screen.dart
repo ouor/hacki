@@ -18,6 +18,7 @@ import 'package:hacki/services/services.dart';
 import 'package:hacki/styles/styles.dart';
 import 'package:hacki/utils/utils.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:scrolls_to_top/scrolls_to_top.dart';
 
 class ItemScreenArgs extends Equatable {
   const ItemScreenArgs({
@@ -158,7 +159,7 @@ class _ItemScreenState extends State<ItemScreen>
       AppDurations.oneSecond;
   static const double _indentPadding = 8;
   static const double _indentLineWidth = 2;
-  static const double _webViewOffsetInvisible = 0.06;
+  static const double _webViewOffsetInvisible = 0.1;
   bool _isWebViewBottomSheetVisible = true;
 
   @override
@@ -226,155 +227,136 @@ class _ItemScreenState extends State<ItemScreen>
             }
           },
         ),
-      ],
-      child: BlocListener<EditCubit, EditState>(
-        listenWhen: (EditState previous, EditState current) {
-          return previous.replyingTo != current.replyingTo ||
-              previous.itemBeingEdited != current.itemBeingEdited ||
-              commentEditingController.text != current.text;
-        },
-        listener: (BuildContext context, EditState editState) {
-          if (editState.replyingTo != null ||
-              editState.itemBeingEdited != null) {
-            if (editState.text == null) {
-              commentEditingController.clear();
+        BlocListener<EditCubit, EditState>(
+          listenWhen: (EditState previous, EditState current) {
+            return previous.replyingTo != current.replyingTo ||
+                previous.itemBeingEdited != current.itemBeingEdited ||
+                commentEditingController.text != current.text;
+          },
+          listener: (BuildContext context, EditState editState) {
+            if (editState.replyingTo != null ||
+                editState.itemBeingEdited != null) {
+              if (editState.text == null) {
+                commentEditingController.clear();
+              } else {
+                final String text = editState.text!;
+                commentEditingController
+                  ..text = text
+                  ..selection = TextSelection.fromPosition(
+                    TextPosition(offset: text.length),
+                  );
+              }
             } else {
-              final String text = editState.text!;
-              commentEditingController
-                ..text = text
-                ..selection = TextSelection.fromPosition(
-                  TextPosition(offset: text.length),
-                );
+              commentEditingController.clear();
             }
-          } else {
-            commentEditingController.clear();
-          }
-        },
-        child: widget.splitViewEnabled
-            ? Material(
-                child: Stack(
-                  children: <Widget>[
-                    const Positioned.fill(
-                      child: ItemScreenBackground(
-                        indentPadding: _indentPadding,
-                        indentLineWidth: _indentLineWidth,
-                        shouldShowRootLevelLine: false,
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: MainView(
-                        topPadding: context.topPadding,
-                        indentPadding: _indentPadding,
-                        scrollOffsetListener: scrollOffsetListener,
-                        commentEditingController: commentEditingController,
-                        preferenceState: context.read<PreferenceCubit>().state,
-                        splitViewEnabled: widget.splitViewEnabled,
-                        indentLineWidth: _indentLineWidth,
-                        onMoreTapped: (Item item, Rect? rect) => onMoreTapped(
-                          item,
-                          rect,
-                          parent: item,
-                          onSearchInThreadTapped: () {
-                            context.pop();
-                            context.read<CommentsCubit>()
-                              ..search(item.by)
-                              ..openInThreadSearch?.call();
-                          },
-                        ),
-                        onRightMoreTapped: (Comment cmt) => onRightMoreTapped(
-                          cmt,
-                          context.read<CommentsCubit>().state.item,
-                        ),
-                        shouldMarkNewComment: widget.shouldMarkNewComment,
-                      ),
-                    ),
-                    BlocBuilder<SplitViewCubit, SplitViewState>(
-                      buildWhen: (
-                        SplitViewState previous,
-                        SplitViewState current,
-                      ) =>
-                          previous.expanded != current.expanded,
-                      builder: (
-                        BuildContext context,
-                        SplitViewState state,
-                      ) {
-                        return Positioned(
-                          top: Dimens.zero,
-                          left: Dimens.zero,
-                          right: Dimens.zero,
-                          child: CustomAppBar(
-                            context: context,
-                            backgroundColor: Theme.of(context)
-                                .canvasColor
-                                .withValues(alpha: 0.6),
-                            foregroundColor: Theme.of(context).iconTheme.color,
-                            item: widget.item,
-                            splitViewEnabled: state.enabled,
-                            expanded: state.expanded,
-                            onZoomTap: context.read<SplitViewCubit>().zoom,
-                            onFontSizeTap: onFontSizeTapped,
-                            fontSizeIconButtonKey: fontSizeIconButtonKey,
-                          ),
-                        );
-                      },
-                    ),
-                    if (context
-                        .read<PreferenceCubit>()
-                        .state
-                        .areSkipButtonsEnabled)
-                      const Positioned(
-                        right: Dimens.pt12,
-                        bottom: Dimens.pt36,
-                        child: FloatingSkipButtons(),
-                      ),
-                    if (widget.item is Story && widget.item.url.isNotEmpty)
-                      Positioned.fill(
-                        child: AnimatedSlide(
-                          offset: Offset(
-                            0,
-                            _isWebViewBottomSheetVisible
-                                ? 0
-                                : _webViewOffsetInvisible,
-                          ),
-                          duration: AppDurations.ms200,
-                          child: WebViewBottomSheet(
-                            initialUrl: widget.item.url,
-                            onDragHandleTapped: () {
-                              if (!_isWebViewBottomSheetVisible) {
-                                setState(() {
-                                  _isWebViewBottomSheetVisible = true;
-                                });
-                              }
-                            },
-                            onCloseTapped: () {
-                              setState(() {
-                                _isWebViewBottomSheetVisible =
-                                    !_isWebViewBottomSheetVisible;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      bottom: Dimens.zero,
-                      left: Dimens.zero,
-                      right: Dimens.zero,
-                      child: Material(
-                        child: ReplyBox(
-                          splitViewEnabled: true,
-                          focusNode: focusNode,
-                          textEditingController: commentEditingController,
-                          onSendTapped: onSendTapped,
-                          onChanged: context.read<EditCubit>().onTextChanged,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : Stack(
+          },
+        ),
+      ],
+      child: widget.splitViewEnabled
+          ? Material(
+              child: Stack(
                 children: <Widget>[
+                  const Positioned.fill(
+                    child: ItemScreenBackground(
+                      indentPadding: _indentPadding,
+                      indentLineWidth: _indentLineWidth,
+                      shouldShowRootLevelLine: false,
+                    ),
+                  ),
                   Positioned.fill(
+                    child: MainView(
+                      topPadding: context.topPadding,
+                      indentPadding: _indentPadding,
+                      scrollOffsetListener: scrollOffsetListener,
+                      commentEditingController: commentEditingController,
+                      preferenceState: context.read<PreferenceCubit>().state,
+                      splitViewEnabled: widget.splitViewEnabled,
+                      indentLineWidth: _indentLineWidth,
+                      onMoreTapped: (Item item, Rect? rect) => onMoreTapped(
+                        item,
+                        rect,
+                        parent: item,
+                        onSearchInThreadTapped: () {
+                          context.pop();
+                          context.read<CommentsCubit>()
+                            ..search(item.by)
+                            ..openInThreadSearch?.call();
+                        },
+                      ),
+                      onRightMoreTapped: (Comment cmt) => onRightMoreTapped(
+                        cmt,
+                        context.read<CommentsCubit>().state.item,
+                      ),
+                      onStoryUrlTapped: () {
+                        setState(() {
+                          _isWebViewBottomSheetVisible = true;
+                        });
+                      },
+                      shouldMarkNewComment: widget.shouldMarkNewComment,
+                    ),
+                  ),
+                  BlocBuilder<SplitViewCubit, SplitViewState>(
+                    buildWhen: (
+                      SplitViewState previous,
+                      SplitViewState current,
+                    ) =>
+                        previous.expanded != current.expanded,
+                    builder: (
+                      BuildContext context,
+                      SplitViewState state,
+                    ) {
+                      return Positioned(
+                        top: Dimens.zero,
+                        left: Dimens.zero,
+                        right: Dimens.zero,
+                        child: CustomAppBar(
+                          context: context,
+                          backgroundColor: Theme.of(context)
+                              .canvasColor
+                              .withValues(alpha: 0.6),
+                          foregroundColor: Theme.of(context).iconTheme.color,
+                          item: widget.item,
+                          splitViewEnabled: state.enabled,
+                          expanded: state.expanded,
+                          onZoomTap: context.read<SplitViewCubit>().zoom,
+                          onFontSizeTap: onFontSizeTapped,
+                          fontSizeIconButtonKey: fontSizeIconButtonKey,
+                        ),
+                      );
+                    },
+                  ),
+                  if (context
+                      .read<PreferenceCubit>()
+                      .state
+                      .areSkipButtonsEnabled)
+                    const Positioned(
+                      right: Dimens.pt12,
+                      bottom: Dimens.pt36,
+                      child: FloatingSkipButtons(),
+                    ),
+                  if (widget.item is Story && widget.item.url.isNotEmpty)
+                    webViewBottomSheet,
+                  Positioned(
+                    bottom: Dimens.zero,
+                    left: Dimens.zero,
+                    right: Dimens.zero,
+                    child: Material(
+                      child: ReplyBox(
+                        splitViewEnabled: true,
+                        focusNode: focusNode,
+                        textEditingController: commentEditingController,
+                        onSendTapped: onSendTapped,
+                        onChanged: context.read<EditCubit>().onTextChanged,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: ScrollsToTop(
                     child: Scaffold(
                       extendBodyBehindAppBar: true,
                       resizeToAvoidBottomInset: true,
@@ -424,6 +406,11 @@ class _ItemScreenState extends State<ItemScreen>
                                 cmt,
                                 context.read<CommentsCubit>().state.item,
                               ),
+                              onStoryUrlTapped: () {
+                                setState(() {
+                                  _isWebViewBottomSheetVisible = true;
+                                });
+                              },
                               shouldMarkNewComment: widget.shouldMarkNewComment,
                             ),
                           ),
@@ -454,40 +441,41 @@ class _ItemScreenState extends State<ItemScreen>
                         onChanged: context.read<EditCubit>().onTextChanged,
                       ),
                     ),
+                    onScrollsToTop: (_) =>
+                        context.read<CommentsCubit>().scrollTo(index: 0),
                   ),
-                  if (widget.item is Story && widget.item.url.isNotEmpty)
-                    Positioned.fill(
-                      child: AnimatedSlide(
-                        offset: Offset(
-                          0,
-                          _isWebViewBottomSheetVisible
-                              ? 0
-                              : _webViewOffsetInvisible,
-                        ),
-                        duration: AppDurations.ms200,
-                        child: WebViewBottomSheet(
-                          initialUrl: widget.item.url,
-                          onDragHandleTapped: () {
-                            if (!_isWebViewBottomSheetVisible) {
-                              setState(() {
-                                _isWebViewBottomSheetVisible = true;
-                              });
-                            }
-                          },
-                          onCloseTapped: () {
-                            setState(() {
-                              _isWebViewBottomSheetVisible =
-                                  !_isWebViewBottomSheetVisible;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-      ),
+                ),
+                if (widget.item is Story && widget.item.url.isNotEmpty)
+                  webViewBottomSheet,
+              ],
+            ),
     );
   }
+
+  Widget get webViewBottomSheet => Positioned.fill(
+        child: AnimatedSlide(
+          offset: Offset(
+            0,
+            _isWebViewBottomSheetVisible ? 0 : _webViewOffsetInvisible,
+          ),
+          duration: AppDurations.ms200,
+          child: WebViewBottomSheet(
+            initialUrl: widget.item.url,
+            onDragHandleTapped: () {
+              if (!_isWebViewBottomSheetVisible) {
+                setState(() {
+                  _isWebViewBottomSheetVisible = true;
+                });
+              }
+            },
+            onCloseTapped: () {
+              setState(() {
+                _isWebViewBottomSheetVisible = !_isWebViewBottomSheetVisible;
+              });
+            },
+          ),
+        ),
+      );
 
   void removeReplyBoxFocusOnScroll(double _) {
     focusNode.unfocus();
