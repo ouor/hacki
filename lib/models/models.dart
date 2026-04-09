@@ -18,4 +18,5 @@ export 'search/search_params.dart';
 export 'status.dart';
 export 'story_marking_mode.dart';
 export 'story_type.dart';
+export 'translation_config.dart';
 export 'user.dart';

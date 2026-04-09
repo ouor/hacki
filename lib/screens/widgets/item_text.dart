@@ -46,8 +46,10 @@ class ItemText extends StatelessWidget {
       }
     }
 
+    final Widget content;
+
     if (selectable && item is Buildable) {
-      return SelectableText.rich(
+      content = SelectableText.rich(
         buildTextSpan(
           (item as Buildable).elements,
           primaryColor: Theme.of(context).colorScheme.primaryContainer,
@@ -75,60 +77,153 @@ class ItemText extends StatelessWidget {
         ),
         semanticsLabel: item.text,
       );
+    } else if (item is Buildable) {
+      content = InkWell(
+        child: Text.rich(
+          buildTextSpan(
+            (item as Buildable).elements,
+            primaryColor: Theme.of(context).colorScheme.primaryContainer,
+            style: style,
+            linkStyle: linkStyle,
+            onOpen: (LinkableElement link) => LinkUtils.launch(
+              link.url,
+              context,
+            ),
+          ),
+          textScaler: textScaler,
+          semanticsLabel: item.text,
+        ),
+      );
+    } else if (selectable) {
+      content = InkWell(
+        child: SelectableLinkify(
+          text: item.text,
+          textScaler: textScaler,
+          style: style,
+          linkStyle: linkStyle,
+          onOpen: (LinkableElement link) => LinkUtils.launch(
+            link.url,
+            context,
+          ),
+          contextMenuBuilder: (
+            BuildContext context,
+            EditableTextState editableTextState,
+          ) =>
+              contextMenuBuilder(
+            context,
+            editableTextState,
+            item: item,
+          ),
+        ),
+      );
     } else {
-      if (item is Buildable) {
-        return InkWell(
-          child: Text.rich(
-            buildTextSpan(
-              (item as Buildable).elements,
-              primaryColor: Theme.of(context).colorScheme.primaryContainer,
-              style: style,
-              linkStyle: linkStyle,
-              onOpen: (LinkableElement link) => LinkUtils.launch(
-                link.url,
-                context,
-              ),
-            ),
-            textScaler: textScaler,
-            semanticsLabel: item.text,
+      content = InkWell(
+        child: Linkify(
+          text: item.text,
+          textScaler: textScaler,
+          style: style,
+          linkStyle: linkStyle,
+          onOpen: (LinkableElement link) => LinkUtils.launch(
+            link.url,
+            context,
           ),
-        );
-      } else if (selectable) {
-        return InkWell(
-          child: SelectableLinkify(
-            text: item.text,
-            textScaler: textScaler,
-            style: style,
-            linkStyle: linkStyle,
-            onOpen: (LinkableElement link) => LinkUtils.launch(
-              link.url,
-              context,
-            ),
-            contextMenuBuilder: (
-              BuildContext context,
-              EditableTextState editableTextState,
-            ) =>
-                contextMenuBuilder(
-              context,
-              editableTextState,
-              item: item,
-            ),
-          ),
-        );
-      } else {
-        return InkWell(
-          child: Linkify(
-            text: item.text,
-            textScaler: textScaler,
-            style: style,
-            linkStyle: linkStyle,
-            onOpen: (LinkableElement link) => LinkUtils.launch(
-              link.url,
-              context,
-            ),
-          ),
-        );
-      }
+        ),
+      );
     }
+
+    if (item.text.trim().isEmpty) {
+      return content;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        content,
+        _TranslationSection(
+          item: item,
+          style: style,
+          textScaler: textScaler,
+        ),
+      ],
+    );
+  }
+}
+
+class _TranslationSection extends StatelessWidget {
+  const _TranslationSection({
+    required this.item,
+    required this.style,
+    required this.textScaler,
+  });
+
+  final Item item;
+  final TextStyle style;
+  final TextScaler textScaler;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<TranslationCubit>(
+      create: (_) => TranslationCubit(),
+      child: BlocConsumer<TranslationCubit, TranslationState>(
+        listenWhen: (
+          TranslationState previous,
+          TranslationState current,
+        ) =>
+            previous.errorMessage != current.errorMessage &&
+            current.errorMessage != null,
+        listener: (BuildContext context, TranslationState state) {
+          context.showErrorSnackBar(state.errorMessage);
+        },
+        builder: (BuildContext context, TranslationState state) {
+          final String buttonLabel = switch (state.status) {
+            Status.inProgress => 'Translating...',
+            _ when state.translatedText != null && state.isVisible =>
+              'Hide translation',
+            _ when state.translatedText != null => 'Show translation',
+            _ => 'Translate',
+          };
+
+          return Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextButton.icon(
+                  onPressed: state.status == Status.inProgress
+                      ? null
+                      : () => context.read<TranslationCubit>().toggle(
+                            text: item.text,
+                          ),
+                  icon: state.status == Status.inProgress
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.translate, size: 18),
+                  label: Text(buttonLabel),
+                ),
+                if (state.translatedText != null && state.isVisible)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SelectableText(
+                      state.translatedText!,
+                      style: style,
+                      textScaler: textScaler,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }

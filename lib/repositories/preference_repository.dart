@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hacki/config/constants.dart';
 import 'package:hacki/extensions/extensions.dart';
+import 'package:hacki/models/models.dart';
 import 'package:hacki/utils/debouncer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:synced_shared_preferences/synced_shared_preferences.dart';
@@ -27,6 +28,10 @@ class PreferenceRepository with Loggable {
   static const String _lastReadStoryIdKey = 'lastReadStoryId';
   static const String _downloadTimestampKey = 'downloadTimestamp';
   static const String _tourKey = 'tour';
+  static const String _translationBaseUrlKey = 'translationBaseUrl';
+  static const String _translationModelNameKey = 'translationModelName';
+  static const String _translationPromptKey = 'translationPrompt';
+  static const String _translationApiKey = 'translationApiKey';
 
   final SyncedSharedPreferences _syncedPrefs;
   final Future<SharedPreferences> _prefs;
@@ -50,6 +55,10 @@ class PreferenceRepository with Loggable {
         (SharedPreferences prefs) => prefs.getDouble(key),
       );
 
+  Future<String?> getString(String key) => _prefs.then(
+        (SharedPreferences prefs) => prefs.getString(key),
+      );
+
   //ignore: avoid_positional_boolean_parameters
   void setBool(String key, bool val) => _prefs.then(
         (SharedPreferences prefs) => prefs.setBool(key, val),
@@ -62,6 +71,43 @@ class PreferenceRepository with Loggable {
   void setDouble(String key, double val) => _prefs.then(
         (SharedPreferences prefs) => prefs.setDouble(key, val),
       );
+
+  void setString(String key, String val) => _prefs.then(
+        (SharedPreferences prefs) => prefs.setString(key, val),
+      );
+
+  Future<TranslationConfig> getTranslationConfig() async {
+    return TranslationConfig(
+      baseUrl: await getString(_translationBaseUrlKey) ?? '',
+      apiKey: await _secureStorage.read(key: _translationApiKey) ?? '',
+      modelName: await getString(_translationModelNameKey) ?? '',
+      translatePrompt: await getString(_translationPromptKey) ?? '',
+    );
+  }
+
+  Future<void> setTranslationBaseUrl(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(_translationBaseUrlKey, value);
+  }
+
+  Future<void> setTranslationModelName(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(_translationModelNameKey, value);
+  }
+
+  Future<void> setTranslationPrompt(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(_translationPromptKey, value);
+  }
+
+  Future<void> setTranslationApiKey(String value) async {
+    const AndroidOptions androidOptions = AndroidOptions.defaultOptions;
+    await _secureStorage.write(
+      key: _translationApiKey,
+      value: value,
+      aOptions: androidOptions,
+    );
+  }
 
   Future<bool?> get hasSeenTour => getBool(_tourKey);
 

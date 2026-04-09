@@ -68,6 +68,14 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView>
     with ItemActionMixin, Loggable {
+  TranslationConfig _translationConfig = const TranslationConfig();
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadTranslationConfig());
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PreferenceCubit, PreferenceState>(
@@ -440,6 +448,82 @@ class _SettingsViewState extends State<SettingsView>
                   'Theme',
                 ),
                 onTap: showThemeSettingDialog,
+              ),
+              const Divider(),
+              ListTile(
+                leading: Icon(
+                  Icons.translate,
+                  color: _translationConfig.isConfigured
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                ),
+                title: const Text('LLM Translation'),
+                subtitle: Text(
+                  _translationConfig.isConfigured
+                      ? 'Ready to translate item text'
+                      : 'Set BASE_URL, API_KEY, MODEL_NAME and TRANSLATE_PROMPT',
+                ),
+              ),
+              ListTile(
+                title: const Text('BASE_URL'),
+                subtitle: Text(_displayTranslationValue(
+                  _translationConfig.baseUrl,
+                )),
+                onTap: () => _showTranslationSettingDialog(
+                  title: 'BASE_URL',
+                  initialValue: _translationConfig.baseUrl,
+                  hintText: 'https://api.deepseek.com/chat/completions',
+                  onSaved: locator
+                      .get<PreferenceRepository>()
+                      .setTranslationBaseUrl,
+                ),
+              ),
+              ListTile(
+                title: const Text('API_KEY'),
+                subtitle: Text(
+                  _displayTranslationValue(
+                    _translationConfig.apiKey,
+                    isSecret: true,
+                  ),
+                ),
+                onTap: () => _showTranslationSettingDialog(
+                  title: 'API_KEY',
+                  initialValue: _translationConfig.apiKey,
+                  hintText: 'sk-...',
+                  obscureText: true,
+                  onSaved:
+                      locator.get<PreferenceRepository>().setTranslationApiKey,
+                ),
+              ),
+              ListTile(
+                title: const Text('MODEL_NAME'),
+                subtitle: Text(_displayTranslationValue(
+                  _translationConfig.modelName,
+                )),
+                onTap: () => _showTranslationSettingDialog(
+                  title: 'MODEL_NAME',
+                  initialValue: _translationConfig.modelName,
+                  hintText: 'deepseek-chat',
+                  onSaved: locator
+                      .get<PreferenceRepository>()
+                      .setTranslationModelName,
+                ),
+              ),
+              ListTile(
+                title: const Text('TRANSLATE_PROMPT'),
+                subtitle: Text(_displayTranslationValue(
+                  _translationConfig.translatePrompt,
+                )),
+                onTap: () => _showTranslationSettingDialog(
+                  title: 'TRANSLATE_PROMPT',
+                  initialValue: _translationConfig.translatePrompt,
+                  hintText:
+                      'Translate the user text into Korean. Return only the translated text.',
+                  minLines: 4,
+                  maxLines: 8,
+                  onSaved:
+                      locator.get<PreferenceRepository>().setTranslationPrompt,
+                ),
               ),
               const Divider(),
               ListTile(
@@ -1072,6 +1156,100 @@ class _SettingsViewState extends State<SettingsView>
               child: const Text(
                 'Okay',
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _loadTranslationConfig() async {
+    final TranslationConfig config =
+        await locator.get<PreferenceRepository>().getTranslationConfig();
+    if (!mounted) return;
+    setState(() {
+      _translationConfig = config;
+    });
+  }
+
+  String _displayTranslationValue(
+    String value, {
+    bool isSecret = false,
+  }) {
+    final String trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return 'Not set';
+    }
+
+    if (isSecret) {
+      return 'Configured';
+    }
+
+    final String singleLine = trimmed.replaceAll('\n', ' ');
+    if (singleLine.length <= 80) {
+      return singleLine;
+    }
+    return '${singleLine.substring(0, 77)}...';
+  }
+
+  Future<void> _showTranslationSettingDialog({
+    required String title,
+    required String initialValue,
+    required Future<void> Function(String value) onSaved,
+    String? hintText,
+    bool obscureText = false,
+    int minLines = 1,
+    int maxLines = 1,
+  }) async {
+    final TextEditingController controller =
+        TextEditingController(text: initialValue);
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            obscureText: obscureText,
+            minLines: minLines,
+            maxLines: maxLines,
+            decoration: InputDecoration(
+              hintText: hintText,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await onSaved('');
+                if (!mounted) return;
+                Navigator.of(context).pop();
+                await _loadTranslationConfig();
+                if (!mounted) return;
+                showSnackBar(content: '$title cleared.');
+              },
+              child: const Text(
+                'Clear',
+                style: TextStyle(
+                  color: Palette.red,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await onSaved(controller.text.trim());
+                if (!mounted) return;
+                Navigator.of(context).pop();
+                await _loadTranslationConfig();
+                if (!mounted) return;
+                showSnackBar(content: '$title saved.');
+              },
+              child: const Text('Save'),
             ),
           ],
         );
